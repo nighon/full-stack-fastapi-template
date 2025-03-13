@@ -170,3 +170,106 @@ The email templates are in `./backend/app/email-templates/`. Here, there are two
 Before continuing, ensure you have the [MJML extension](https://marketplace.visualstudio.com/items?itemName=attilabuti.vscode-mjml) installed in your VS Code.
 
 Once you have the MJML extension installed, you can create a new email template in the `src` directory. After creating the new email template and with the `.mjml` file open in your editor, open the command palette with `Ctrl+Shift+P` and search for `MJML: Export to HTML`. This will convert the `.mjml` file to a `.html` file and now you can save it in the build directory.
+
+---
+
+In Python, what is the difference between `async for x in async_iterator` and `for x in await async_iterator`?
+Asked 2 years, 1 month ago
+Modified 2 years, 1 month ago
+Viewed 1k times
+7
+
+The subject contains the whole idea. I came accross code sample where it shows something like:
+
+async for item in getItems():
+    await item.process()
+And others where the code is:
+
+for item in await getItems():
+    await item.process()
+Is there a notable difference in these two approaches?
+
+In Python, what is the difference between `async for x in async_iterator` and `for x in await async_iterator`?
+
+
+```python
+async for item in getItems():
+    await item.process()
+```
+
+
+```python
+for item in await getItems():
+    await item.process()
+```
+
+---
+
+It looks the project `full-stack-fastapi-template` does not support async feature. So I want to refactor it. For example,
+
+
+```python
+# backend/app/api/deps.py
+from collections.abc import Generator
+from typing import Annotated
+
+import jwt
+from fastapi import Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
+from jwt.exceptions import InvalidTokenError
+from pydantic import ValidationError
+from sqlmodel import Session
+
+from app.core import security
+from app.core.config import settings
+from app.core.db import engine
+from app.models import TokenPayload, User
+
+reusable_oauth2 = OAuth2PasswordBearer(
+    tokenUrl=f"{settings.API_V1_STR}/login/access-token"
+)
+
+
+def get_db() -> Generator[Session, None, None]:
+    with Session(engine) as session:
+        yield session
+
+
+SessionDep = Annotated[Session, Depends(get_db)]
+TokenDep = Annotated[str, Depends(reusable_oauth2)]
+
+
+def get_current_user(session: SessionDep, token: TokenDep) -> User:
+    try:
+        payload = jwt.decode(
+            token, settings.SECRET_KEY, algorithms=[security.ALGORITHM]
+        )
+        token_data = TokenPayload(**payload)
+    except (InvalidTokenError, ValidationError):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Could not validate credentials",
+        )
+    user = session.get(User, token_data.sub)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    if not user.is_active:
+        raise HTTPException(status_code=400, detail="Inactive user")
+    return user
+
+
+CurrentUser = Annotated[User, Depends(get_current_user)]
+
+```
+
+I added an async version of function `get_db()`:
+
+```python
+async def async_get_db() -> Generator[Session, None, None]:
+    with Session(engine) as session:
+        yield await session
+```
+
+---
+
+Without the async feature, will https requests block each other if I use this template?

@@ -17,7 +17,8 @@ services:
       # - PGDATA=/var/lib/postgresql/data/pgdata
       - MYSQL_PASSWORD=${MYSQL_PASSWORD?Variable not set}
       - MYSQL_USER=${MYSQL_USER?Variable not set}
-      - MYSQL_DB=${MYSQL_DB?Variable not set}
+      - MYSQL_DATABASE=${MYSQL_DB?Variable not set}
+      - MYSQL_ROOT_PASSWORD=root
 
   # adminer:
   #   image: adminer
@@ -41,6 +42,18 @@ services:
   #     - traefik.http.routers.${STACK_NAME?Variable not set}-adminer-https.tls=true
   #     - traefik.http.routers.${STACK_NAME?Variable not set}-adminer-https.tls.certresolver=le
   #     - traefik.http.services.${STACK_NAME?Variable not set}-adminer.loadbalancer.server.port=8080
+  phpmyadmin:
+    image: phpmyadmin
+    restart: always
+    environment:
+      PMA_HOST: db
+      # PMA_USER: example_user
+      # PMA_PASSWORD: example_password
+    ports:
+      - 8080:80
+    depends_on:
+      - db
+
 
   # prestart:
   #   image: '${DOCKER_IMAGE_BACKEND?Variable not set}:${TAG-latest}'
