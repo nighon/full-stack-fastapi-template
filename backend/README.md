@@ -273,3 +273,10 @@ async def async_get_db() -> Generator[Session, None, None]:
 ---
 
 Without the async feature, will https requests block each other if I use this template?
+
+
+---
+
+curl -i http://localhost:8000/api/v1/users/
+
+curl -i -X POST -H 'Content-Type: application/json' -d '{"email": "nighon@qq.com", "password": "12341234", "full_name": "nighon1"}' -- http://localhost:8000/api/v1/users/
