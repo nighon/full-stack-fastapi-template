@@ -275,8 +275,60 @@ async def async_get_db() -> Generator[Session, None, None]:
 Without the async feature, will https requests block each other if I use this template?
 
 
+
+---
+
+What does orm_mode = True mean in Pydantic?
+
+```python
+from pydantic import BaseModel
+
+
+class UserSchema(BaseModel):
+    id: int
+    name: str
+    email: str
+
+    class Config:
+        orm_mode = True
+```
+
+---
+
+So, in Pydantic v2, we do do like this?
+
+```python
+pydantic_model = UserSchema(orm_user)
+pydantic_model = UserSchema.model_validate(orm_user)
+```
+
+
+
+---
+
+I don't want to use SQLModel. Could you convert the code int `models.py` to the code using Pydantic and SQLAlchemy?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ---
 
 curl -i http://localhost:8000/api/v1/users/
 
 curl -i -X POST -H 'Content-Type: application/json' -d '{"email": "nighon@qq.com", "password": "12341234", "full_name": "nighon1"}' -- http://localhost:8000/api/v1/users/
+
