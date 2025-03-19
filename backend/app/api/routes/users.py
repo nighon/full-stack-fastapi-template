@@ -24,7 +24,9 @@ from app.models import (
     # UserUpdate,
     # UserUpdateMe,
 )
-from app.schemas import PageResponse, UserCreate, UserPublic
+from app.schema.request import UserCreate
+from app.schema.response import PageResponse, UserPublic
+# from app.schemas import PageResponse, UserCreate, UserPublic
 # from app.utils import generate_new_account_email, send_email
 
 router = APIRouter(prefix="/users", tags=["users"])

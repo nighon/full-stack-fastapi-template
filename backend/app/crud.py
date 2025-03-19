@@ -6,7 +6,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 # from app.core.security import get_password_hash, verify_password
 from app.models import User
-from app.schemas import UserCreate
+from app.schema.request import UserCreate
+# from app.schemas import UserCreate
 # from app.models import Item, ItemCreate, User, UserCreate, UserUpdate
 
 

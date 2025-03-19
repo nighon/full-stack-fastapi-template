@@ -371,3 +371,81 @@ INFO  [alembic.autogenerate.compare] Detected added table ''
 ```
 
 
+---
+
+What does this mean?
+
+```python
+from typing import Generic, List, TypeVar
+from pydantic import BaseModel, Field
+
+T = TypeVar('T')
+
+class PageResponse(BaseModel, Generic[T]):
+    total: int
+    data: List[T]
+```
+
+---
+
+Which one is preferred for the returned data format of a restful api endpoint:
+
+1. single user data
+
+/api/v1/users/100
+
+```json
+{
+    "status": 10040,
+    "data": {
+        "id": 100,
+        "username": "john",
+        "created_at": "2025-03-10 12:00"
+    }
+}
+```
+
+vs this:
+
+```json
+{
+    "id": 100,
+    "username": "john",
+    "created_at": "2025-03-10 12:00"
+}
+```
+
+2. a list of users
+
+/api/v1/users
+
+```json
+{
+    "status": 10040,
+    "data": {
+        "total": 1,
+        "data": [
+            {
+                "id": 100,
+                "username": "john",
+                "created_at": "2025-03-10 12:00"
+            }
+        ]
+    }
+}
+```
+
+vs this:
+
+```json
+{
+    "total": 1,
+    "data": [
+        {
+            "id": 100,
+            "username": "john",
+            "created_at": "2025-03-10 12:00"
+        }
+    ]
+}
+```
