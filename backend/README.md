@@ -260,7 +260,18 @@ def get_current_user(session: SessionDep, token: TokenDep) -> User:
 
 CurrentUser = Annotated[User, Depends(get_current_user)]
 
+
 ```
+
+What is the difference between $() and ``? For example,
+
+```
+➜  full-stack-fastapi-template git:(main) ✗ echo $(pwd)
+/Users/john/Code/full-stack-fastapi-template
+➜  full-stack-fastapi-template git:(main) ✗ echo `pwd`
+/Users/john/Code/full-stack-fastapi-template
+```
+
 
 I added an async version of function `get_db()`:
 
@@ -309,13 +320,20 @@ pydantic_model = UserSchema.model_validate(orm_user)
 I don't want to use SQLModel. Could you convert the code int `models.py` to the code using Pydantic and SQLAlchemy?
 
 
+Because I want to have different directories to keep these models, to make things clean and easy to understand. For example.
+
+app/models: for SQLAlchemy models
+app/schemas: for Pydantic models (response_model for rest api)
+app/request_models: for Pydantic models (request_model for rest api)
 
 
 
 
+Or, I want to have directories like this,
 
-
-
+app/models (for SQLAlchemy models)
+app/schemas/request (for request models)
+app/schemas/response (for response models)
 
 
 
@@ -331,4 +349,25 @@ I don't want to use SQLModel. Could you convert the code int `models.py` to the 
 curl -i http://localhost:8000/api/v1/users/
 
 curl -i -X POST -H 'Content-Type: application/json' -d '{"email": "nighon@qq.com", "password": "12341234", "full_name": "nighon1"}' -- http://localhost:8000/api/v1/users/
+
+
+
+
+
+curl -i -X POST -H 'Content-Type: application/json' -d '{"name": "nighon@qq.com"}' -- http://localhost:8000/api/v1/users/
+
+
+
+---
+
+Does the message indicate it is successful?
+
+```
+(app) ➜  backend git:(main) ✗ alembic revision --autogenerate -m 'init'
+INFO  [alembic.runtime.migration] Context impl MySQLImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.autogenerate.compare] Detected added table ''
+  Generating /Users/john/Code/full-stack-fastapi-template/backend/app/alembic/versions/62854d70f17a_init.py ...  done
+```
+
 

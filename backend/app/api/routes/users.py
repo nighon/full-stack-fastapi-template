@@ -6,25 +6,26 @@ from sqlmodel import col, delete, func, select
 
 from app import crud
 from app.api.deps import (
-    CurrentUser,
+    # CurrentUser,
     AsyncSessionDep,
-    get_current_active_superuser,
+    # get_current_active_superuser,
 )
-from app.core.config import settings
-from app.core.security import get_password_hash, verify_password
+# from app.core.config import settings
+# from app.core.security import get_password_hash, verify_password
 from app.models import (
-    Item,
-    Message,
-    UpdatePassword,
+    # Item,
+    # Message,
+    # UpdatePassword,
     User,
-    UserCreate,
-    UserPublic,
-    UserRegister,
-    UsersPublic,
-    UserUpdate,
-    UserUpdateMe,
+    # UserCreate,
+    # UserPublic,
+    # UserRegister,
+    # UsersPublic,
+    # UserUpdate,
+    # UserUpdateMe,
 )
-from app.utils import generate_new_account_email, send_email
+from app.schemas import PageResponse, UserCreate, UserPublic
+# from app.utils import generate_new_account_email, send_email
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -32,7 +33,7 @@ router = APIRouter(prefix="/users", tags=["users"])
 @router.get(
     "/",
     # dependencies=[Depends(get_current_active_superuser)],
-    response_model=UsersPublic,
+    response_model=PageResponse[UserPublic],
 )
 async def read_users(session: AsyncSessionDep, skip: int = 0, limit: int = 100) -> Any:
     """
@@ -40,12 +41,12 @@ async def read_users(session: AsyncSessionDep, skip: int = 0, limit: int = 100) 
     """
 
     count_statement = select(func.count()).select_from(User)
-    count = (await session.execute(count_statement)).scalar()
+    total = (await session.execute(count_statement)).scalar()
 
     statement = select(User).offset(skip).limit(limit)
     users = (await session.execute(statement)).scalars().all()
 
-    return UsersPublic(data=users, count=count)
+    return PageResponse(data=users, total=total)
 
 
 @router.post(
@@ -58,12 +59,12 @@ async def create_user(*, session: AsyncSessionDep, user_in: UserCreate) -> User:
     """
     Create new user.
     """
-    user = await crud.get_user_by_email(session=session, email=user_in.email)
-    if user:
-        raise HTTPException(
-            status_code=400,
-            detail="The user with this email already exists in the system.",
-        )
+    # user = await crud.get_user_by_email(session=session, email=user_in.email)
+    # if user:
+    #     raise HTTPException(
+    #         status_code=400,
+    #         detail="The user with this email already exists in the system.",
+    #     )
 
     user = await crud.create_user(session=session, user_create=user_in)
     # if settings.emails_enabled and user_in.email:
